@@ -1,893 +1,623 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth antialiased">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PM Second Brain | Strategic Intelligence</title>
-    <!-- Tailwind CSS -->
+    <title>The 2025 PM & Tech Finance Playbook (Dark Mode)</title>
+    <!-- 
+      Design Philosophy: Apple Developer Documentation (Dark Mode)
+      - Backgrounds: True Black (#000000) for main content, Dark Gray (#1c1c1e) for sidebar.
+      - Text: Off-white (#f5f5f7) for primary to reduce eye strain vs pure white.
+      - Accent: Lighter, vibrant blue (#0a84ff) for visibility against dark backgrounds.
+      - Borders: Subtle dark gray (#38383a).
+    -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-                    },
-                    colors: {
-                        brain: {
-                            bg: '#000000',      // True Black
-                            surface: '#1C1C1E', // Apple System Gray 6 (Dark)
-                            card: '#2C2C2E',    // Apple System Gray 5 (Dark)
-                            border: '#3A3A3C',  // Apple System Gray 4 (Dark)
-                            primary: '#0A84FF', // iOS Dark Mode Blue
-                            accent: '#BF5AF2',  // iOS Dark Mode Purple
-                            text: '#F2F2F7',    // Apple System Gray 6 (Light - Text)
-                            subtext: '#98989D'  // Apple System Gray 2 (Light - Subtext)
-                        }
-                    },
-                    boxShadow: {
-                        'glow': '0 0 20px rgba(10, 132, 255, 0.15)',
-                        'glow-accent': '0 0 20px rgba(191, 90, 242, 0.15)',
-                    }
-                }
-            }
-        }
-    </script>
+    
     <style>
-        /* Dark Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-bg: #1c1c1e; /* Apple System Gray 6 Dark */
+            --main-bg: #000000;
+            --accent-color: #0a84ff; /* Apple Dark Mode Blue */
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b; /* System Gray */
+            --border-color: #38383a;
+            --card-bg: #1c1c1e;
+            --hover-bg: rgba(255, 255, 255, 0.1);
         }
-        ::-webkit-scrollbar-track {
-            background: #000;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-primary);
+            background-color: var(--main-bg);
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden; /* App-like feel */
+        }
+
+        /* Custom Scrollbar for Dark Mode */
+        ::-webkit-scrollbar {
+            width: 12px;
+            background: var(--main-bg);
         }
         ::-webkit-scrollbar-thumb {
-            background: #3A3A3C;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #505055;
+            background-color: #38383a;
+            border-radius: 6px;
+            border: 3px solid var(--main-bg);
         }
 
-        /* Dark Glassmorphism */
-        .glass-panel {
-            background: rgba(28, 28, 30, 0.75);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 50;
         }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            background-color: var(--main-bg);
+        }
+
+        /* Typography Override */
+        h1 { letter-spacing: -0.02em; color: var(--text-primary); }
+        h2 { letter-spacing: -0.01em; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; color: #fff; }
+        p, li { line-height: 1.6; color: #d1d1d6; margin-bottom: 1.2rem; }
+        strong { color: #fff; font-weight: 600; }
         
-        .glass-nav {
-            background: rgba(28, 28, 30, 0.6);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Utilities */
-        .accordion-content {
-            transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease-in-out;
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-        }
-        .accordion-content.open {
-            opacity: 1;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-
-        /* Chart Gradients */
-        .chart-container {
+        /* Interactive "Read" Checkbox */
+        .read-toggle {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #636366;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
             position: relative;
+            background-color: transparent;
+            top: 4px;
         }
-        
-        ::selection {
-            background: #0A84FF;
+        .read-toggle:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        .read-toggle:checked::after {
+            content: '✓';
             color: white;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Pro Tip / Note Box */
+        .callout {
+            background-color: #1c1c1e; /* Card BG */
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid #38383a;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        /* Navigation Item Styling */
+        .nav-group-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin: 24px 20px 8px 20px;
+            letter-spacing: 0.05em;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #98989d;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            border-radius: 6px;
+            margin: 0 8px;
+        }
+        .nav-item:hover {
+            color: #fff;
+            background-color: var(--hover-bg);
+        }
+        .nav-item.active {
+            color: var(--accent-color);
+            background: rgba(10, 132, 255, 0.15);
+        }
+
+        /* Progress Bar (Sticky Header) */
+        .progress-header {
+            position: sticky;
+            top: 0;
+            background: rgba(0,0,0,0.85); /* Dark Blur */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 40;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            background-color: rgba(28, 28, 30, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
         }
     </style>
 </head>
-<body class="bg-brain-bg text-brain-text h-screen overflow-hidden flex flex-col md:flex-row font-sans selection:bg-brain-primary selection:text-white">
+<body>
 
-    <!-- Mobile Header -->
-    <header class="md:hidden glass-panel fixed top-0 w-full z-50 px-4 py-3 flex justify-between items-center shadow-lg">
-        <div class="flex items-center gap-2">
-            <i class="fa-solid fa-brain text-brain-primary text-xl"></i>
-            <span class="font-semibold text-lg tracking-tight">Second<span class="text-brain-primary">Brain</span></span>
-        </div>
-        <button id="mobile-menu-btn" class="w-10 h-10 rounded-full bg-brain-card flex items-center justify-center text-brain-primary hover:bg-brain-border transition-colors border border-white/5">
-            <i class="fa-solid fa-bars text-lg"></i>
+    <!-- Mobile Menu Toggle -->
+    <div class="md:hidden mobile-header fixed top-0 left-0 w-full h-14 z-50 flex items-center px-4 justify-between">
+        <span class="font-semibold text-white">PM Playbook</span>
+        <button id="menu-btn" class="p-2 text-gray-400 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
-    </header>
-
-    <!-- Mobile Navigation Overlay -->
-    <div id="mobile-nav-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-md z-40 hidden opacity-0 transition-opacity duration-300">
-        <div id="mobile-nav-drawer" class="absolute right-0 top-0 h-full w-72 bg-brain-surface shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col border-l border-white/10">
-            <div class="p-5 flex justify-between items-center border-b border-white/10">
-                <span class="font-bold text-lg">Neural Net</span>
-                <button id="close-menu-btn" class="w-8 h-8 rounded-full bg-brain-card flex items-center justify-center text-brain-subtext border border-white/5">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-6" id="mobile-nav-links">
-                <!-- Links injected by JS -->
-            </div>
-        </div>
     </div>
 
-    <!-- Desktop Sidebar -->
-    <nav class="hidden md:flex flex-col w-72 h-full glass-nav flex-shrink-0 relative z-20">
-        <div class="p-6 pt-8 pb-6">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-glow">
-                    <i class="fa-solid fa-brain text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-xl tracking-tight text-white leading-none">Second<span class="text-brain-primary font-light">Brain</span></h1>
-                    <span class="text-[10px] text-brain-subtext font-medium uppercase tracking-widest">Strategic Intelligence</span>
-                </div>
-            </div>
-            
-            <!-- Search Simulation -->
-            <div class="relative group">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-magnifying-glass text-brain-subtext text-xs group-hover:text-white transition-colors"></i>
-                </div>
-                <input type="text" class="block w-full pl-9 pr-3 py-2 border border-white/10 rounded-lg leading-5 bg-brain-card text-brain-subtext placeholder-gray-500 focus:outline-none focus:bg-brain-border focus:text-white sm:text-sm transition-colors" placeholder="Search Knowledge Base...">
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span class="text-gray-600 text-xs">⌘K</span>
-                </div>
-            </div>
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="sidebar flex flex-col pt-14 md:pt-6 pb-10">
+        <div class="px-5 mb-6">
+            <h1 class="text-xl font-bold tracking-tight text-white">The 2025 Playbook</h1>
+            <p class="text-xs text-gray-400 mt-1">Deep Research Edition</p>
         </div>
-        
-        <div class="flex-1 overflow-y-auto px-4 pb-4 space-y-8" id="desktop-nav-links">
-            <!-- Navigation Groups -->
-            <div>
-                <h3 class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Core Architecture</h3>
-                <ul class="space-y-1">
-                    <li><a href="#microservices" class="nav-item group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-brain-subtext hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5">
-                        <span class="w-6 h-6 rounded bg-white/5 group-hover:bg-blue-500/20 flex items-center justify-center text-gray-400 group-hover:text-blue-400 transition-colors"><i class="fa-solid fa-server text-xs"></i></span> Microservices
-                    </a></li>
-                    <li><a href="#data-stack" class="nav-item group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-brain-subtext hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5">
-                        <span class="w-6 h-6 rounded bg-white/5 group-hover:bg-purple-500/20 flex items-center justify-center text-gray-400 group-hover:text-purple-400 transition-colors"><i class="fa-solid fa-database text-xs"></i></span> Modern Data Stack
-                    </a></li>
-                    <li><a href="#rag" class="nav-item group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-brain-subtext hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5">
-                        <span class="w-6 h-6 rounded bg-white/5 group-hover:bg-pink-500/20 flex items-center justify-center text-gray-400 group-hover:text-pink-400 transition-colors"><i class="fa-solid fa-microchip text-xs"></i></span> GenAI & RAG
-                    </a></li>
-                </ul>
-            </div>
 
-            <div>
-                <h3 class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Strategy Engines</h3>
-                <ul class="space-y-1">
-                    <li><a href="#saas-metrics" class="nav-item group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-brain-subtext hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5">
-                        <span class="w-6 h-6 rounded bg-white/5 group-hover:bg-green-500/20 flex items-center justify-center text-gray-400 group-hover:text-green-400 transition-colors"><i class="fa-solid fa-chart-line text-xs"></i></span> SaaS Economics
-                    </a></li>
-                    <li><a href="#finops" class="nav-item group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-brain-subtext hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5">
-                        <span class="w-6 h-6 rounded bg-white/5 group-hover:bg-orange-500/20 flex items-center justify-center text-gray-400 group-hover:text-orange-400 transition-colors"><i class="fa-solid fa-coins text-xs"></i></span> FinOps
-                    </a></li>
-                     <li><a href="#wardley" class="nav-item group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-brain-subtext hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5">
-                        <span class="w-6 h-6 rounded bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center text-gray-400 group-hover:text-indigo-400 transition-colors"><i class="fa-solid fa-map text-xs"></i></span> Wardley Maps
-                    </a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h3 class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Operating Systems</h3>
-                <ul class="space-y-1">
-                    <li><a href="#team-topologies" class="nav-item group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-brain-subtext hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5">
-                        <span class="w-6 h-6 rounded bg-white/5 group-hover:bg-teal-500/20 flex items-center justify-center text-gray-400 group-hover:text-teal-400 transition-colors"><i class="fa-solid fa-users-gear text-xs"></i></span> Team Topologies
-                    </a></li>
-                    <li><a href="#spade" class="nav-item group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-brain-subtext hover:bg-white/5 hover:text-white transition-all border border-transparent hover:border-white/5">
-                        <span class="w-6 h-6 rounded bg-white/5 group-hover:bg-red-500/20 flex items-center justify-center text-gray-400 group-hover:text-red-400 transition-colors"><i class="fa-solid fa-gavel text-xs"></i></span> Decision Logic
-                    </a></li>
-                </ul>
-            </div>
+        <div id="nav-container">
+            <!-- Nav Items Injected JS -->
         </div>
-        
-        <!-- Footer -->
-        <div class="p-4 border-t border-white/5 bg-black/20">
-            <div class="flex items-center gap-3 px-2 py-1">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 border border-white/10 shadow-sm flex items-center justify-center text-[10px] font-bold text-white">
-                    PM
-                </div>
-                <div>
-                    <p class="text-xs font-bold text-white">Executive View</p>
-                    <p class="text-[10px] text-brain-primary">System Online</p>
-                </div>
+
+        <div class="mt-auto px-5 pt-6 border-t border-[#38383a]">
+            <div class="flex items-center justify-between text-xs font-medium text-gray-400 mb-2">
+                <span>Knowledge Mastery</span>
+                <span id="global-percent">0%</span>
             </div>
+            <div class="w-full bg-[#38383a] rounded-full h-1.5">
+                <div id="global-bar" class="bg-[#0a84ff] h-1.5 rounded-full shadow-[0_0_10px_rgba(10,132,255,0.5)]" style="width: 0%"></div>
+            </div>
+            <button onclick="resetProgress()" class="text-[10px] text-gray-500 mt-3 hover:text-red-400 transition-colors w-full text-left">Reset Progress</button>
         </div>
     </nav>
 
     <!-- Main Content Area -->
-    <main class="flex-1 h-full overflow-y-auto overflow-x-hidden relative pt-20 md:pt-0 scroll-smooth bg-gradient-to-b from-brain-bg to-[#0a0a0a]" id="main-scroll-container">
-        <div class="max-w-6xl mx-auto p-4 md:p-12 pb-32">
-            
-            <!-- Hero -->
-            <div class="mb-12 animate-fade-in flex justify-between items-end">
-                <div>
-                    <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">Strategic<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brain-primary to-brain-accent">Frameworks</span></h2>
-                    <p class="text-lg text-brain-subtext max-w-2xl font-light leading-relaxed">
-                        A curated synthesis of architectural patterns, business strategy, and operational models. Designed for the Strategic Technologist.
-                    </p>
-                </div>
-                <div class="hidden md:block">
-                     <!-- Cosmetic Stats -->
-                    <div class="flex gap-6 text-right">
-                        <div>
-                            <div class="text-2xl font-bold text-white">8</div>
-                            <div class="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Modules</div>
-                        </div>
-                         <div>
-                            <div class="text-2xl font-bold text-white">100%</div>
-                            <div class="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Ready</div>
-                        </div>
-                    </div>
-                </div>
+    <main class="main-content relative">
+        <!-- Sticky Header within Content -->
+        <div class="progress-header px-8 py-4 flex items-center justify-between">
+            <div id="current-section-title" class="text-sm font-semibold text-gray-400">Select a Topic</div>
+            <div class="text-xs text-gray-500">
+                <span id="section-progress" class="text-gray-300">0/0</span> Topics Mastered
             </div>
+        </div>
 
-            <!-- Content Grid -->
-            <div class="space-y-12">
-
-                <!-- 1. Monolith vs Microservices -->
-                <article id="microservices" class="group bg-brain-surface rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 shadow-lg relative overflow-hidden">
-                    <!-- Glow Effect -->
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full pointer-events-none group-hover:bg-blue-600/20 transition-all duration-500"></div>
-
-                    <!-- Header -->
-                    <div class="p-6 md:p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                        <div class="flex items-start gap-5">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-2xl shadow-inner border border-white/5 text-blue-500">
-                                <i class="fa-solid fa-server"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-white tracking-tight">Monolith vs. Microservices</h3>
-                                <p class="text-sm text-brain-subtext font-medium mt-1 flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                                    Scale & Complexity
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <!-- Dark Segmented Control -->
-                        <div class="bg-black/40 p-1 rounded-xl flex gap-1 relative w-full md:w-auto self-start border border-white/5">
-                            <button class="tab-btn px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wide text-white bg-brain-card shadow-lg transition-all relative z-10 w-1/3 md:w-auto text-center" onclick="switchTab(this, 'ms-biz')">Strategy</button>
-                            <button class="tab-btn px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wide text-brain-subtext hover:text-white transition-colors relative z-10 w-1/3 md:w-auto text-center" onclick="switchTab(this, 'ms-tech')">Tech</button>
-                            <button class="tab-btn px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wide text-brain-subtext hover:text-white transition-colors relative z-10 w-1/3 md:w-auto text-center" onclick="switchTab(this, 'ms-interview')">Case</button>
-                        </div>
-                    </div>
-
-                    <!-- Body -->
-                    <div class="p-6 md:p-8 min-h-[300px] relative z-10">
-                        
-                        <!-- TAB: Strategy -->
-                        <div id="ms-biz" class="tab-content block animate-fade-in">
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                                <div>
-                                    <div class="mb-8">
-                                        <h4 class="text-white text-lg font-medium mb-3">The Executive Trade-off</h4>
-                                        <p class="text-gray-400 text-sm leading-relaxed">
-                                            The choice is economic, not just technical. <strong class="text-white">Monoliths</strong> optimize for initial velocity but create a "complexity ceiling." <strong class="text-white">Microservices</strong> optimize for infinite scale but impose a high upfront "DevOps Tax."
-                                        </p>
-                                    </div>
-                                    
-                                    <!-- Dark Accordion -->
-                                    <div class="border border-white/10 rounded-2xl overflow-hidden mb-4 bg-white/5">
-                                        <button class="w-full flex justify-between items-center p-4 hover:bg-white/5 transition-colors text-left group" onclick="toggleAccordion(this)">
-                                            <span class="font-semibold text-gray-300 text-sm group-hover:text-brain-primary transition-colors">Strategic Trigger: The Complexity Tax</span>
-                                            <i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform duration-300"></i>
-                                        </button>
-                                        <div class="accordion-content bg-black/20">
-                                            <div class="p-4 text-sm text-gray-400 space-y-2 border-t border-white/5">
-                                                <p>Re-architect when:</p>
-                                                <ul class="list-disc pl-5 space-y-1 marker:text-brain-primary">
-                                                    <li>Deployment frequency drops (e.g., from daily to bi-weekly).</li>
-                                                    <li>Scaling one feature (Search) requires scaling the entire monolith.</li>
-                                                    <li>Team size > 50 (Conway's Law indicates communication breakdown).</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="border border-white/10 rounded-2xl overflow-hidden bg-white/5">
-                                        <button class="w-full flex justify-between items-center p-4 hover:bg-white/5 transition-colors text-left group" onclick="toggleAccordion(this)">
-                                            <span class="font-semibold text-gray-300 text-sm group-hover:text-brain-primary transition-colors">TCO Analysis (CapEx vs OpEx)</span>
-                                            <i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform duration-300"></i>
-                                        </button>
-                                        <div class="accordion-content bg-black/20">
-                                            <div class="p-4 text-sm text-gray-400 space-y-2 border-t border-white/5">
-                                                <ul class="list-disc pl-5 space-y-1 marker:text-brain-primary">
-                                                    <li><strong>Monolith:</strong> Low CapEx. High long-term OpEx (maintenance/tech debt).</li>
-                                                    <li><strong>Microservices:</strong> High CapEx (Kubernetes, CI/CD). Lower long-term OpEx *if* automated correctly.</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Chart Wrapper -->
-                                <div class="bg-black/40 rounded-2xl p-6 h-72 border border-white/5 relative shadow-inner">
-                                    <h5 class="absolute top-4 left-6 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Cost Curve Projection</h5>
-                                    <canvas id="chart-tco"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB: Technical -->
-                        <div id="ms-tech" class="tab-content hidden animate-fade-in">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="p-6 bg-orange-900/10 rounded-2xl border border-orange-500/20 hover:border-orange-500/40 transition-colors">
-                                    <h5 class="font-bold text-orange-400 mb-3 text-sm flex items-center gap-2"><i class="fa-solid fa-cube"></i>Monolith</h5>
-                                    <p class="text-xs text-gray-400 leading-relaxed mb-3">Unified codebase. In-process function calls (nanoseconds). Single database ACID transactions.</p>
-                                    <div class="text-[10px] font-mono bg-black/50 p-3 rounded border border-white/5 text-orange-200/80">
-                                        User -> App (All Logic) -> DB
-                                    </div>
-                                </div>
-                                <div class="p-6 bg-blue-900/10 rounded-2xl border border-blue-500/20 hover:border-blue-500/40 transition-colors">
-                                    <h5 class="font-bold text-blue-400 mb-3 text-sm flex items-center gap-2"><i class="fa-solid fa-cubes"></i>Microservices</h5>
-                                    <p class="text-xs text-gray-400 leading-relaxed mb-3">Distributed services. Network calls (latency). Polyglot persistence. API Gateway required.</p>
-                                    <div class="text-[10px] font-mono bg-black/50 p-3 rounded border border-white/5 text-blue-200/80">
-                                        User -> Gateway -> [Auth] + [Cart]
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-6 space-y-2">
-                                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Deep Dive: Trade-offs</h4>
-                                <div class="border border-white/10 rounded-xl bg-brain-card">
-                                    <button class="w-full flex justify-between items-center p-3 text-sm font-medium hover:bg-white/5 text-gray-300 rounded-xl transition-colors" onclick="toggleAccordion(this)">
-                                        <span>Data Consistency (ACID vs. BASE)</span>
-                                        <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
-                                    </button>
-                                    <div class="accordion-content">
-                                        <div class="p-3 text-xs text-gray-400 bg-black/20 rounded-b-xl border-t border-white/5 leading-relaxed">
-                                            Monoliths utilize ACID transactions (Easy, consistent). Microservices require "Eventual Consistency" (BASE) using patterns like Sagas or Distributed Locks (Hard).
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB: Interview -->
-                        <div id="ms-interview" class="tab-content hidden animate-fade-in">
-                            <div class="space-y-4">
-                                <div class="bg-indigo-900/10 p-6 rounded-2xl border border-indigo-500/20 relative">
-                                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-l-2xl"></div>
-                                    <span class="inline-block px-2 py-0.5 bg-indigo-500/20 text-indigo-300 text-[10px] font-bold uppercase tracking-wider rounded mb-3 border border-indigo-500/20">PM Scenario</span>
-                                    <h4 class="font-bold text-white mb-2 text-sm">"We're building 'Tinder for Dogs'. Monolith or Microservices?"</h4>
-                                    <p class="text-gray-400 text-sm leading-relaxed mb-0">
-                                        <strong>The Trap:</strong> Jumping to "Microservices" because it sounds scalable.<br><br>
-                                        <strong>The Best Answer:</strong> "I'd advocate for a **well-structured Monolith**. Our risk right now isn't scale; it's product-market fit. A monolith allows us to iterate fastest with a small team. We will design clear module boundaries (Modulith) so we can extract services later *if* we succeed."
-                                    </p>
-                                </div>
-                                <div class="bg-brain-card p-6 rounded-2xl border border-white/10 shadow-sm">
-                                    <h4 class="font-bold text-gray-200 mb-2 text-sm">C-Suite Narrative</h4>
-                                    <p class="text-gray-500 text-sm italic font-light">"Microservices are not an engineering project; they are an organizational investment. We are paying a higher upfront 'tax' in complexity to buy the option of infinite team scalability later. If we don't plan to hire 100+ engineers, we don't need to pay this tax."</p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </article>
-
-                <!-- 2. Modern Data Stack -->
-                <article id="data-stack" class="group bg-brain-surface rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 shadow-lg relative overflow-hidden">
-                     <div class="absolute top-0 left-0 w-64 h-64 bg-purple-600/10 blur-[100px] rounded-full pointer-events-none group-hover:bg-purple-600/20 transition-all duration-500"></div>
-                     
-                    <div class="p-6 md:p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-                        <div class="flex items-start gap-5">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-2xl shadow-inner border border-white/5 text-purple-500">
-                                <i class="fa-solid fa-layer-group"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-white tracking-tight">Modern Data Stack</h3>
-                                <p class="text-sm text-brain-subtext font-medium mt-1 flex items-center gap-2">
-                                     <span class="w-2 h-2 rounded-full bg-purple-500"></span>
-                                    Decision Infrastructure
-                                </p>
-                            </div>
-                        </div>
-                        <div class="bg-black/40 p-1 rounded-xl flex gap-1 relative w-full md:w-auto border border-white/5">
-                            <button class="tab-btn px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wide text-white bg-brain-card shadow-lg transition-all w-1/3 md:w-auto text-center" onclick="switchTab(this, 'ds-overview')">Pipeline</button>
-                            <button class="tab-btn px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wide text-brain-subtext hover:text-white transition-colors w-1/3 md:w-auto text-center" onclick="switchTab(this, 'ds-schemas')">Schemas</button>
-                            <button class="tab-btn px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wide text-brain-subtext hover:text-white transition-colors w-1/3 md:w-auto text-center" onclick="switchTab(this, 'ds-kpi')">KPIs</button>
-                        </div>
-                    </div>
-
-                    <div class="p-6 md:p-8 relative z-10">
-                        <!-- Overview -->
-                        <div id="ds-overview" class="tab-content block animate-fade-in">
-                            <h4 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-6 text-center">The ELT Architecture (Extract, Load, Transform)</h4>
-                            
-                            <div class="flex flex-col md:flex-row gap-4 mb-8 relative">
-                                <!-- Connector Line -->
-                                <div class="hidden md:block absolute top-1/2 left-0 w-full h-px bg-white/10 -z-10 -translate-y-1/2"></div>
-
-                                <div class="flex-1 p-4 rounded-2xl border border-white/10 bg-brain-card text-center shadow-lg relative z-10">
-                                    <div class="text-[9px] uppercase font-bold text-gray-500 mb-2">Source</div>
-                                    <div class="font-bold text-white text-sm">Apps & DBs</div>
-                                    <div class="text-[9px] text-gray-500 mt-1">Raw Data</div>
-                                </div>
-                                <div class="flex-1 p-4 rounded-2xl border border-purple-500/30 bg-purple-900/10 text-center shadow-lg shadow-purple-500/10 relative z-10">
-                                    <div class="text-[9px] uppercase font-bold text-purple-400 mb-2">Extract/Load</div>
-                                    <div class="font-bold text-white text-sm">Fivetran</div>
-                                    <div class="text-[9px] text-purple-300/50 mt-1">Ingestion</div>
-                                </div>
-                                <div class="flex-1 p-4 rounded-2xl border border-blue-500/30 bg-blue-900/10 text-center shadow-lg shadow-blue-500/10 relative z-10">
-                                    <div class="text-[9px] uppercase font-bold text-blue-400 mb-2">Storage</div>
-                                    <div class="font-bold text-white text-sm">Snowflake</div>
-                                    <div class="text-[9px] text-blue-300/50 mt-1">Warehouse</div>
-                                </div>
-                                <div class="flex-1 p-4 rounded-2xl border border-orange-500/30 bg-orange-900/10 text-center shadow-lg shadow-orange-500/10 relative z-10">
-                                    <div class="text-[9px] uppercase font-bold text-orange-400 mb-2">Transform</div>
-                                    <div class="font-bold text-white text-sm">dbt</div>
-                                    <div class="text-[9px] text-orange-300/50 mt-1">Modeling</div>
-                                </div>
-                                <div class="flex-1 p-4 rounded-2xl border border-white/10 bg-brain-card text-center shadow-lg relative z-10">
-                                    <div class="text-[9px] uppercase font-bold text-gray-500 mb-2">Visualize</div>
-                                    <div class="font-bold text-white text-sm">Looker</div>
-                                    <div class="text-[9px] text-gray-500 mt-1">Insights</div>
-                                </div>
-                            </div>
-                             <p class="text-sm text-gray-400 mb-0 bg-white/5 p-4 rounded-xl border border-white/5">
-                                <strong class="text-white">Insight:</strong> The shift from ETL to <strong>ELT</strong> allows us to dump raw data first, then transform it using SQL (dbt). This decouples Data Engineering (Pipelines) from Data Analysis (Business Logic), increasing velocity.
-                            </p>
-                        </div>
-
-                        <!-- Schemas -->
-                        <div id="ds-schemas" class="tab-content hidden animate-fade-in">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <div class="flex items-center justify-between mb-3">
-                                        <h4 class="font-bold text-gray-200 text-sm">Star Schema</h4>
-                                        <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-gray-400 font-medium border border-white/5">Reporting</span>
-                                    </div>
-                                    <div class="p-5 bg-black/30 rounded-2xl border border-white/5 text-sm space-y-3">
-                                        <div class="flex justify-center mb-2"><span class="bg-blue-900/40 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-md text-xs font-bold">Fact Table (Sales)</span></div>
-                                        <div class="flex justify-center gap-2">
-                                            <span class="bg-white/5 border border-white/10 text-gray-400 px-2 py-1 rounded text-[10px]">Dim: Date</span>
-                                            <span class="bg-white/5 border border-white/10 text-gray-400 px-2 py-1 rounded text-[10px]">Dim: Product</span>
-                                        </div>
-                                        <p class="mt-2 text-gray-500 text-xs text-center italic">"Total revenue by region in Q3."</p>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center justify-between mb-3">
-                                        <h4 class="font-bold text-gray-200 text-sm">Activity Schema</h4>
-                                        <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-gray-400 font-medium border border-white/5">Product Analytics</span>
-                                    </div>
-                                    <div class="p-5 bg-black/30 rounded-2xl border border-white/5 text-sm space-y-3">
-                                        <div class="bg-black/50 border border-white/10 p-3 rounded-xl text-[10px] font-mono text-gray-400 overflow-hidden leading-loose">
-                                            <span class="text-gray-600">TIME &nbsp;&nbsp;| USER &nbsp;| EVENT</span><br>
-                                            <span class="text-green-400/80">10:01</span> | Alice | Clicked_Buy<br>
-                                            <span class="text-green-400/80">10:02</span> | Alice | Viewed_Cart
-                                        </div>
-                                        <p class="mt-2 text-gray-500 text-xs text-center italic">"What did users do before churning?"</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- KPIs -->
-                        <div id="ds-kpi" class="tab-content hidden animate-fade-in">
-                             <div class="space-y-3">
-                                <div class="border border-white/10 rounded-2xl overflow-hidden bg-white/5">
-                                    <button class="w-full flex justify-between items-center p-4 hover:bg-white/5 transition-colors text-left group" onclick="toggleAccordion(this)">
-                                        <span class="font-semibold text-gray-300 text-sm group-hover:text-brain-primary transition-colors">OKR vs. KPI</span>
-                                        <i class="fa-solid fa-chevron-down text-gray-500 text-xs"></i>
-                                    </button>
-                                    <div class="accordion-content bg-black/20">
-                                        <div class="p-4 text-sm text-gray-400 border-t border-white/5">
-                                            <strong class="text-white">OKRs</strong> change the business (e.g., "Launch X").<br>
-                                            <strong class="text-white">KPIs</strong> run the business (e.g., "Uptime").<br>
-                                            <em>Insight:</em> A completed OKR often becomes a maintenance KPI.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 3. SaaS Metrics -->
-                <article id="saas-metrics" class="group bg-brain-surface rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 shadow-lg relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-green-600/10 blur-[100px] rounded-full pointer-events-none group-hover:bg-green-600/20 transition-all duration-500"></div>
-
-                    <div class="p-6 md:p-8 border-b border-white/5 flex items-center justify-between relative z-10">
-                         <div class="flex items-start gap-5">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-2xl shadow-inner border border-white/5 text-green-500">
-                                <i class="fa-solid fa-chart-pie"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-white tracking-tight">SaaS Economics</h3>
-                                <p class="text-sm text-brain-subtext font-medium mt-1 flex items-center gap-2">
-                                     <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    Valuation & Health
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-6 md:p-8 relative z-10">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                            <div>
-                                <h4 class="text-lg font-bold text-white mb-2">The Rule of 40</h4>
-                                <p class="text-sm text-gray-400 mb-6 leading-relaxed">
-                                    The golden rule for mature SaaS: <strong class="text-white">Growth Rate % + Profit Margin % should be > 40%</strong>. <br><br>
-                                    It balances the "Growth at all costs" mindset with profitability.
-                                </p>
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between text-sm p-4 bg-red-900/10 text-red-200 rounded-2xl border border-red-500/20">
-                                        <span class="font-medium">Company A: 10% Growth + 10% Margin = 20%</span>
-                                        <i class="fa-solid fa-circle-xmark text-red-500"></i>
-                                    </div>
-                                    <div class="flex items-center justify-between text-sm p-4 bg-green-900/10 text-green-200 rounded-2xl border border-green-500/20">
-                                        <span class="font-medium">Company B: 30% Growth + 15% Margin = 45%</span>
-                                        <i class="fa-solid fa-circle-check text-green-500"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-black/40 rounded-2xl p-6 h-64 border border-white/5 relative shadow-inner">
-                                <canvas id="chart-rule40"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                 <!-- 4. RAG / AI -->
-                 <article id="rag" class="group bg-brain-surface rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 shadow-lg relative overflow-hidden">
-                     <div class="p-6 md:p-8 border-b border-white/5 relative z-10">
-                        <div class="flex items-start gap-5">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-2xl shadow-inner border border-white/5 text-pink-500">
-                                <i class="fa-solid fa-brain"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-white tracking-tight">GenAI & RAG</h3>
-                                <p class="text-sm text-brain-subtext font-medium mt-1 flex items-center gap-2">
-                                     <span class="w-2 h-2 rounded-full bg-pink-500"></span>
-                                    Retrieval Augmented Generation
-                                </p>
-                            </div>
-                        </div>
-                     </div>
-                     <div class="p-6 md:p-8 relative z-10">
-                         <div class="bg-black/40 rounded-3xl p-6 text-white mb-8 shadow-xl relative overflow-hidden border border-white/5">
-                             <!-- Visual Effects -->
-                             <div class="absolute top-0 right-0 w-48 h-48 bg-pink-500 blur-[90px] opacity-20 rounded-full pointer-events-none"></div>
-                             <div class="absolute bottom-0 left-0 w-32 h-32 bg-blue-500 blur-[70px] opacity-10 rounded-full pointer-events-none"></div>
-                             
-                             <h4 class="relative z-10 text-[10px] font-bold tracking-widest text-pink-400 mb-6 uppercase">Flow Architecture</h4>
-                             
-                             <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4 text-center">
-                                 <div class="bg-white/5 backdrop-blur-md p-5 rounded-2xl flex-1 border border-white/10 w-full">
-                                     <div class="text-2xl mb-2">📄</div>
-                                     <div class="text-xs font-bold text-gray-200">Documents</div>
-                                     <div class="text-[9px] text-gray-500 mt-1">Private Data</div>
-                                 </div>
-                                 <i class="fa-solid fa-arrow-right text-gray-600 rotate-90 md:rotate-0"></i>
-                                 <div class="bg-white/5 backdrop-blur-md p-5 rounded-2xl flex-1 border border-white/10 w-full">
-                                     <div class="text-2xl mb-2">🔢</div>
-                                     <div class="text-xs font-bold text-gray-200">Vector DB</div>
-                                     <div class="text-[9px] text-gray-500 mt-1">Embeddings</div>
-                                 </div>
-                                 <i class="fa-solid fa-arrow-right text-gray-600 rotate-90 md:rotate-0"></i>
-                                  <div class="bg-white/5 backdrop-blur-md p-5 rounded-2xl flex-1 border border-white/10 w-full">
-                                     <div class="text-2xl mb-2">🤖</div>
-                                     <div class="text-xs font-bold text-gray-200">LLM</div>
-                                     <div class="text-[9px] text-gray-500 mt-1">Grounded Answer</div>
-                                 </div>
-                             </div>
-                         </div>
-                         
-                         <div class="grid md:grid-cols-2 gap-8">
-                            <div>
-                                <h4 class="font-bold text-white mb-2">Why RAG?</h4>
-                                <p class="text-sm text-gray-400 leading-relaxed">Solves <strong>Hallucinations</strong> and <strong>Data Privacy</strong>. By grounding the AI in your specific documents (Vector DB) before it answers, you get accurate, citable responses without training the model on your data.</p>
-                            </div>
-                            
-                            <!-- Accordion -->
-                            <div class="border border-white/10 rounded-2xl overflow-hidden bg-white/5 h-fit">
-                                <button class="w-full flex justify-between items-center p-4 hover:bg-white/5 transition-colors text-left group" onclick="toggleAccordion(this)">
-                                    <span class="font-semibold text-gray-300 text-sm group-hover:text-pink-400 transition-colors">PM Use Case: Legal Bot</span>
-                                    <i class="fa-solid fa-chevron-down text-gray-500 text-xs transition-transform duration-300"></i>
-                                </button>
-                                <div class="accordion-content bg-black/20">
-                                    <div class="p-4 text-sm text-gray-400 border-t border-white/5">
-                                        <ul class="list-disc pl-5 space-y-2">
-                                            <li><strong>Problem:</strong> Lawyers spend hours searching cases.</li>
-                                            <li><strong>Solution:</strong> RAG system ingesting all past case files.</li>
-                                            <li><strong>Critical Feature:</strong> <span class="text-pink-400 font-medium">Citations</span>. The bot must link to the exact paragraph in the source PDF for verification.</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                         </div>
-                     </div>
-                 </article>
-
-                 <!-- 5. Wardley Mapping -->
-                 <article id="wardley" class="group bg-brain-surface rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 shadow-lg relative overflow-hidden">
-                    <div class="p-6 md:p-8 border-b border-white/5 flex items-center justify-between relative z-10">
-                         <div class="flex items-start gap-5">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-2xl shadow-inner border border-white/5 text-indigo-500">
-                                <i class="fa-solid fa-map"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-white tracking-tight">Wardley Mapping</h3>
-                                <p class="text-sm text-brain-subtext font-medium mt-1 flex items-center gap-2">
-                                     <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                                    Strategic Positioning
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-6 md:p-8 relative z-10">
-                         <div class="flex flex-col lg:flex-row gap-8">
-                             <div class="lg:w-1/3">
-                                 <h4 class="text-base font-bold text-white mb-2">Build vs. Buy Strategy</h4>
-                                 <p class="text-sm text-gray-400 mb-6 leading-relaxed">
-                                     A visual map of your value chain against evolution. <br><br>
-                                     <strong>The Rule:</strong> Build "Genesis" (Differentiators). Buy "Commodities" (Utilities).
-                                 </p>
-                             </div>
-
-                             <div class="lg:w-2/3 bg-black/40 p-6 rounded-3xl border border-white/5 relative h-64 shadow-inner overflow-hidden">
-                                 <!-- Axes -->
-                                 <div class="absolute left-6 bottom-6 top-6 w-px bg-white/10 flex flex-col justify-between text-[10px] text-gray-500 font-bold py-1">
-                                     <span>Visible</span>
-                                     <span>Invisible</span>
-                                 </div>
-                                 <div class="absolute left-6 bottom-6 right-6 h-px bg-white/10 flex justify-between text-[10px] text-gray-500 font-bold px-1 pt-2">
-                                     <span>Genesis</span>
-                                     <span>Commodity</span>
-                                 </div>
-                                 
-                                 <!-- Grid Lines (Subtle) -->
-                                 <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
-
-                                 <!-- Dots -->
-                                 <div class="absolute top-1/4 left-1/4 flex flex-col items-center group cursor-pointer z-10">
-                                     <div class="w-4 h-4 rounded-full bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)] group-hover:scale-125 transition-transform duration-300 border border-white/20"></div>
-                                     <span class="text-xs font-bold text-indigo-300 mt-2 bg-black/50 px-2 py-0.5 rounded backdrop-blur-sm">AI Model</span>
-                                     <span class="text-[9px] text-gray-500">(Build)</span>
-                                 </div>
-
-                                 <div class="absolute bottom-1/3 right-1/4 flex flex-col items-center group cursor-pointer z-10">
-                                     <div class="w-4 h-4 rounded-full bg-gray-600 shadow-sm group-hover:scale-125 transition-transform duration-300 border border-white/20"></div>
-                                     <span class="text-xs font-bold text-gray-400 mt-2 bg-black/50 px-2 py-0.5 rounded backdrop-blur-sm">Cloud Compute</span>
-                                     <span class="text-[9px] text-gray-500">(Buy AWS)</span>
-                                 </div>
-                             </div>
-                         </div>
-                    </div>
-                 </article>
-
-            </div> <!-- End Cards Container -->
+        <!-- Content Container -->
+        <div id="content-area" class="max-w-4xl mx-auto px-6 md:px-12 py-10 pb-24">
+            <!-- Dynamic Content Injected Here -->
         </div>
     </main>
 
-    <!-- JavaScript Logic -->
     <script>
-        // --- Mobile Menu ---
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const closeMenuBtn = document.getElementById('close-menu-btn');
-        const navOverlay = document.getElementById('mobile-nav-overlay');
-        const navDrawer = document.getElementById('mobile-nav-drawer');
-        const mobileNavLinksContainer = document.getElementById('mobile-nav-links');
-        const desktopNavLinks = document.getElementById('desktop-nav-links');
-
-        if(mobileNavLinksContainer && desktopNavLinks){
-            mobileNavLinksContainer.innerHTML = desktopNavLinks.innerHTML;
-        }
-
-        function toggleMenu(show) {
-            if (show) {
-                navOverlay.classList.remove('hidden');
-                setTimeout(() => {
-                    navOverlay.classList.remove('opacity-0');
-                    navDrawer.classList.remove('translate-x-full');
-                }, 10);
-            } else {
-                navOverlay.classList.add('opacity-0');
-                navDrawer.classList.add('translate-x-full');
-                setTimeout(() => {
-                    navOverlay.classList.add('hidden');
-                }, 300);
-            }
-        }
-
-        if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', () => toggleMenu(true));
-        if(closeMenuBtn) closeMenuBtn.addEventListener('click', () => toggleMenu(false));
-        if(navOverlay) navOverlay.addEventListener('click', (e) => {
-            if (e.target === navOverlay) toggleMenu(false);
-        });
+        // --- 1. THE DEEP RESEARCH CONTENT DATABASE ---
+        // Full Content Preserved
         
-        if(mobileNavLinksContainer) {
-            mobileNavLinksContainer.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => toggleMenu(false));
-            });
+        const fullContent = {
+            "p1_rag": {
+                title: "RAG & Agentic AI",
+                category: "Product & AI",
+                sections: [
+                    {
+                        header: "Technical Foundations of RAG",
+                        content: `
+                            <p>Retrieval-Augmented Generation (RAG) is the dominant architecture for Enterprise AI in 2025. Unlike a standard LLM which relies solely on its pre-trained memory (which cuts off at a specific date), RAG connects the model to live, private data.</p>
+                            
+                            <h3>The Architecture Pipeline</h3>
+                            <p>To scope a RAG product, you must understand the three-step flow:</p>
+                            <ul class="list-disc pl-5 space-y-2 mb-4 text-gray-400 text-sm">
+                                <li><strong class="text-gray-200">Ingestion:</strong> Documents are sliced into small "chunks" (paragraphs or sentences).</li>
+                                <li><strong class="text-gray-200">Retrieval:</strong> When a user asks a question, the system searches the chunks for relevant info using "Vector Embeddings".</li>
+                                <li><strong class="text-gray-200">Generation:</strong> The system sends the user's question + the retrieved chunks to the LLM to generate an answer.</li>
+                            </ul>
+                            
+                            <div class="callout">
+                                <strong class="text-white">PM Takeaway:</strong> The quality of a RAG system is usually limited by the <em>Retrieval</em> step, not the Generation step. If the system can't find the right document, GPT-4 cannot answer the question.
+                            </div>
+
+                            <h3>Vector Databases & Embeddings</h3>
+                            <p>Computers don't understand meaning; they understand numbers. <strong>Embedding Models</strong> (like OpenAI's text-embedding-3) convert text into long lists of numbers (vectors). Text with similar meaning ends up with similar numbers.</p>
+                            <p><strong>Vector Databases</strong> (Pinecone, Milvus, Weaviate) are specialized databases built to store these numbers and perform "Similarity Search" incredibly fast. They are the long-term memory of your AI application.</p>
+                        `
+                    },
+                    {
+                        header: "Defining Agentic AI",
+                        content: `
+                            <p>In 2025, we shifted from "Chatbots" to "Agents". A Chatbot waits for a user to type. An <strong>Agent</strong> has goals and can execute actions to achieve them.</p>
+                            
+                            <h3>Core Characteristics</h3>
+                            <ul class="list-disc pl-5 space-y-2 mb-4 text-gray-400 text-sm">
+                                <li><strong class="text-gray-200">Tool Use:</strong> The ability to call functions (APIs, Calculator, Web Search).</li>
+                                <li><strong class="text-gray-200">Reasoning Loops (ReAct):</strong> The agent thinks: <em>"Thought: I need weather data. Action: Call Weather API. Observation: It is raining."</em></li>
+                                <li><strong class="text-gray-200">Planning:</strong> Breaking a vague request ("Book my trip") into sub-tasks (Flights, Hotels, Calendar).</li>
+                            </ul>
+
+                            <h3>Multi-Agent Systems</h3>
+                            <p>Frameworks like <strong>CrewAI</strong> allow you to create a team of specialized agents (e.g., a "Researcher" agent finds data, a "Writer" agent drafts the email). This separation of concerns reduces hallucination and improves complex task performance.</p>
+                        `
+                    },
+                    {
+                        header: "Production & PM Considerations",
+                        content: `
+                            <p>Moving from a demo to production is the hardest phase. PMs must track specific metrics beyond "it feels good."</p>
+                            
+                            <h3>The "RAG Triad" Metrics</h3>
+                            <ul class="list-disc pl-5 space-y-2 mb-4 text-gray-400 text-sm">
+                                <li><strong class="text-gray-200">Context Relevance:</strong> Did we retrieve the right chunk? (Retrieval Metric)</li>
+                                <li><strong class="text-gray-200">Groundedness:</strong> Did the answer rely <em>only</em> on the retrieved chunk? (Hallucination Metric)</li>
+                                <li><strong class="text-gray-200">Answer Relevance:</strong> Did the final answer actually help the user? (Product Metric)</li>
+                            </ul>
+                            
+                            <div class="callout">
+                                <strong class="text-white">Cost Strategy:</strong> Vector search is cheap. LLM generation is expensive. Use "Caching" to store answers to common questions to reduce API costs by 40-60%.
+                            </div>
+                        `
+                    }
+                ]
+            },
+            "p1_tech": {
+                title: "PM Tech Skills 2025",
+                category: "Product & AI",
+                sections: [
+                    {
+                        header: "AI/ML Literacy for PMs",
+                        content: `
+                            <p>You don't need to code the model, but you must understand its constraints. The biggest trade-off decision in 2025 is <strong>Fine-Tuning vs. RAG</strong>.</p>
+                            <ul class="list-disc pl-5 space-y-2 mb-4 text-gray-400 text-sm">
+                                <li><strong class="text-gray-200">RAG:</strong> Use when the model needs to know <em>facts</em> (company wiki, user data). It is cheaper and easier to update.</li>
+                                <li><strong class="text-gray-200">Fine-Tuning:</strong> Use when the model needs to learn a <em>style</em>, <em>format</em>, or highly specific <em>language</em> (e.g., medical coding). It does NOT teach new facts well.</li>
+                            </ul>
+                            <p><strong>Prompt Engineering:</strong> This is now a core PM skill. Understanding "Few-Shot Prompting" (giving the model examples) is often more effective than months of engineering work.</p>
+                        `
+                    },
+                    {
+                        header: "Data & Analytics Mastery",
+                        content: `
+                            <p>In AI products, standard A/B testing fails because the output is non-deterministic (it changes every time). PMs must learn <strong>"Golden Set Evaluation"</strong>.</p>
+                            <p>Create a dataset of 100 "perfect" question-answer pairs (The Golden Set). Every time engineering updates the prompt or model, run these 100 questions and score the AI's answers against your Golden Set. This is your regression test.</p>
+                            <div class="callout">
+                                <strong class="text-white">Key Metric:</strong> <em>Acceptance Rate</em>. In Copilot tools, how often does the user hit "Tab" to accept the suggestion? This is the ultimate measure of utility.
+                            </div>
+                        `
+                    },
+                    {
+                        header: "AI-Enhanced Development",
+                        content: `
+                            <p>Tools like <strong>GitHub Copilot</strong> and <strong>Cursor</strong> have changed the velocity of engineering. A task that took 4 hours might now take 30 minutes.</p>
+                            <p><strong>PM Implication:</strong> Be wary of "Velocity Inflation." Teams generate code faster, but reviewing and testing that code (QA) becomes the bottleneck. Shift your timeline expectations: Coding is fast, Debugging/QA is slow.</p>
+                        `
+                    }
+                ]
+            },
+            "p1_biz": {
+                title: "PM Business Skills 2025",
+                category: "Product & AI",
+                sections: [
+                    {
+                        header: "AI Business Models",
+                        content: `
+                            <p>Monetizing AI is tricky due to high variable costs (GPU compute). We are seeing a shift away from pure flat-rate SaaS.</p>
+                            <h3>Emerging Models</h3>
+                            <ul class="list-disc pl-5 space-y-2 mb-4 text-gray-400 text-sm">
+                                <li><strong class="text-gray-200">Token-Pass-Through:</strong> Enterprise pays a base fee + their own OpenAI API bill.</li>
+                                <li><strong class="text-gray-200">Outcome-Based Pricing:</strong> Don't charge for the software; charge for the result. (e.g., Intercom charging per <em>resolved</em> support ticket, not per seat).</li>
+                                <li><strong class="text-gray-200">Hybrid Freemium:</strong> The "dumb" features are free; the "agentic" features are paid.</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        header: "Strategy & Moats",
+                        content: `
+                            <p>Does your AI product have a moat? <strong>The model itself is NOT a moat.</strong> OpenAI and Anthropic will commoditize intelligence.</p>
+                            <p><strong>The Real Moats in 2025:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2 mb-4 text-gray-400 text-sm">
+                                <li><strong class="text-gray-200">Proprietary Data:</strong> Data that no one else has to feed into RAG.</li>
+                                <li><strong class="text-gray-200">Workflow Integration:</strong> Being deeply embedded in the user's daily habits (the "System of Record").</li>
+                                <li><strong class="text-gray-200">UX/Trust:</strong> The user trusts <em>your</em> agent to execute the trade/send the email.</li>
+                            </ul>
+                        `
+                    }
+                ]
+            },
+            "p2_fund": {
+                title: "Financial Fundamentals",
+                category: "Tech Finance",
+                sections: [
+                    {
+                        header: "Valuation Metrics",
+                        content: `
+                            <p>To talk to Execs, you must speak Finance. The most common metric for SaaS is the <strong>Rule of 40</strong>.</p>
+                            <p><strong>Rule of 40:</strong> Your Annual Growth Rate (%) + Your Profit Margin (%) should equal 40 or higher. <br><em>Example:</em> If you grow 100% YoY, you can burn 60% margin (unprofitable) and still be "healthy" (100 - 60 = 40).</p>
+                            <p><strong>EV/EBITDA:</strong> Used for mature companies. Enterprise Value divided by Earnings Before Interest, Taxes, Depreciation, Amortization. It roughly means "how many years of current profit would it take to buy the company?"</p>
+                        `
+                    },
+                    {
+                        header: "Equity & Cap Tables",
+                        content: `
+                            <p>Understanding your comp package requires knowing the difference between <strong>Preferred</strong> and <strong>Common</strong> stock.</p>
+                            <ul class="list-disc pl-5 space-y-2 mb-4 text-gray-400 text-sm">
+                                <li><strong class="text-gray-200">Liquidation Preference:</strong> Investors (Preferred) usually get paid back 1x their money <em>before</em> employees (Common) see a dime. In a "down round" or poor exit, employees can end up with $0 even if the company sells for millions.</li>
+                                <li><strong class="text-gray-200">409A Valuation:</strong> The "Fair Market Value" of the stock, determined by a third party. This sets the "Strike Price" for your options. You want this to be low (for cheap buy-in) while the investor valuation is high.</li>
+                            </ul>
+                        `
+                    }
+                ]
+            },
+            "p2_econ": {
+                title: "Company Economics",
+                category: "Tech Finance",
+                sections: [
+                    {
+                        header: "SaaS Metrics Deep Dive",
+                        content: `
+                            <p><strong class="text-gray-200">NDR (Net Dollar Retention):</strong> The holy grail. If you stopped acquiring new customers today, would your revenue grow or shrink? <br><em>Calculation:</em> (Starting ARR + Upgrades - Downgrades - Churn) / Starting ARR. <br>Top tier companies have >120% NDR.</p>
+                            <p><strong class="text-gray-200">CAC Payback Period:</strong> How many months of paying us does it take for a customer to pay back the cost of the Sales & Marketing used to get them? <br><em>Target:</em> < 12 months for SMB, < 18 months for Enterprise.</p>
+                        `
+                    },
+                    {
+                        header: "Marketplace Metrics",
+                        content: `
+                            <p>Marketplaces (Uber, Airbnb) live and die by <strong>Liquidity</strong> (the probability of a match). High liquidity creates a flywheel.</p>
+                            <p><strong class="text-gray-200">Take Rate:</strong> The % the platform keeps. App Store is 30% (High). Uber is ~25%. Marketplaces with lower take rates often defend against "disintermediation" (users taking the deal off-platform) better.</p>
+                        `
+                    }
+                ]
+            },
+            "p2_invest": {
+                title: "Investment Landscape",
+                category: "Tech Finance",
+                sections: [
+                    {
+                        header: "The Power Law",
+                        content: `
+                            <p>Venture Capital is driven by the <strong>Power Law</strong>. Returns are not normally distributed.</p>
+                            <div class="callout">
+                                In a fund of 100 companies, 1 company will likely return the entire value of the fund. 5 will do okay. 94 will fail or break even.
+                            </div>
+                            <p>This explains VC behavior: They swing for home runs (100x returns) and ignore singles (3x returns). As a founder or PM, you need to articulate how your product can become a "fund returner" (Billion dollar outcome).</p>
+                        `
+                    },
+                    {
+                        header: "Major Players",
+                        content: `
+                            <p><strong class="text-gray-200">Sequoia:</strong> The gold standard. Known for "market making" and sticking with companies for decades (Apple, Google, Nvidia).</p>
+                            <p><strong class="text-gray-200">Andreessen Horowitz (a16z):</strong> The "Agency" model. They provide massive operational support (marketing, talent) but take high fees. Famous for "Software is Eating the World."</p>
+                            <p><strong class="text-gray-200">Tiger Global:</strong> The "Velocity" model. They invest fast, do less diligence, and pay high prices, treating startups like an index fund asset class.</p>
+                        `
+                    }
+                ]
+            },
+            "p2_read": {
+                title: "Reading the Ecosystem",
+                category: "Tech Finance",
+                sections: [
+                    {
+                        header: "Sources & Signals",
+                        content: `
+                            <p><strong class="text-gray-200">Stratechery (Ben Thompson):</strong> Essential for "Aggregation Theory" and platform strategy.</p>
+                            <p><strong class="text-gray-200">The Information:</strong> The best source for org-chart drama and actual revenue numbers (before they are public).</p>
+                            <p><strong class="text-gray-200">Hacker News (Y Combinator):</strong> The raw sentiment of the engineering class. If you want to know if a dev tool is actually good, look here, not on Gartner.</p>
+                        `
+                    },
+                    {
+                        header: "Earnings Calls",
+                        content: `
+                            <p>Don't just look at the stock price. Read the <strong>Transcript</strong>. Look for "Guidance" (what they predict for next quarter). <br>If a company beats earnings (made more money than expected) but lowers guidance (expects to make less next time), the stock will crash. Markets trade on the <em>future</em>, not the past.</p>
+                        `
+                    }
+                ]
+            },
+            "p2_conv": {
+                title: "The Tech Conversation",
+                category: "Tech Finance",
+                sections: [
+                    {
+                        header: "Interview & Networking",
+                        content: `
+                            <p><strong class="text-gray-200">The Contrarian Take:</strong> In interviews, you will often be asked "What do you believe that few others do?" (Thiel question). <br><em>Good Answer Strategy:</em> Pick a structural shift. "I believe LLMs will make the 'Seat-based' SaaS pricing model obsolete by 2026, forcing a shift to outcome-based billing."</p>
+                            <p><strong class="text-gray-200">Case Math:</strong> PM interviews often ask for estimation. "How much storage does Gmail need?" <br><em>Tip:</em> Memorize the powers of 10. <br>1 Million users x 1 GB = 1 Petabyte. <br>Knowing your "Tech Finance" numbers (AWS costs, storage costs) makes you look like a CTO-level thinker.</p>
+                        `
+                    }
+                ]
+            }
+        };
+
+        // --- 2. APP LOGIC ---
+
+        const navContainer = document.getElementById('nav-container');
+        const contentArea = document.getElementById('content-area');
+        const currentSectionTitle = document.getElementById('current-section-title');
+        const sectionProgress = document.getElementById('section-progress');
+        const globalPercent = document.getElementById('global-percent');
+        const globalBar = document.getElementById('global-bar');
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        let activeKey = null;
+
+        function init() {
+            renderNav();
+            // Load first item by default
+            const firstKey = Object.keys(fullContent)[0];
+            loadSection(firstKey);
+            updateProgress();
         }
 
-        // --- Tabs ---
-        window.switchTab = function(btn, targetId) {
-            const card = btn.closest('.group'); // Using 'group' class of the article
+        function renderNav() {
+            let currentCategory = "";
+            let html = "";
             
-            // Visual Toggle
-            const buttons = card.querySelectorAll('.tab-btn');
-            buttons.forEach(b => {
-                b.classList.remove('bg-brain-card', 'text-white', 'shadow-lg');
-                b.classList.add('text-brain-subtext', 'hover:text-white');
+            for (const [key, data] of Object.entries(fullContent)) {
+                if (data.category !== currentCategory) {
+                    html += `<div class="nav-group-title">${data.category}</div>`;
+                    currentCategory = data.category;
+                }
+                html += `
+                    <div id="nav-${key}" class="nav-item" onclick="loadSection('${key}')">
+                        ${data.title}
+                    </div>
+                `;
+            }
+            navContainer.innerHTML = html;
+        }
+
+        window.loadSection = (key) => {
+            activeKey = key;
+            const data = fullContent[key];
+            
+            // Highlight Nav
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${key}`).classList.add('active');
+
+            // Set Header
+            currentSectionTitle.innerText = data.title;
+
+            // Render Content
+            let html = `
+                <div class="mb-10">
+                    <h1 class="text-4xl font-bold mb-4 tracking-tight">${data.title}</h1>
+                    <div class="h-1 w-20 bg-[#38383a] rounded"></div>
+                </div>
+            `;
+
+            data.sections.forEach((section, index) => {
+                const itemId = `chk_${key}_${index}`;
+                const isChecked = localStorage.getItem(itemId) === 'true' ? 'checked' : '';
+
+                html += `
+                    <div class="mb-12 animate-fade-in" style="animation-delay: ${index * 0.1}s">
+                        <div class="flex items-baseline justify-between mb-4 border-b border-[#38383a] pb-2">
+                            <h2 class="text-2xl font-semibold text-white m-0 p-0">${section.header}</h2>
+                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                <span class="text-xs text-gray-500 group-hover:text-gray-300 font-medium">Mark Read</span>
+                                <input type="checkbox" class="read-toggle" id="${itemId}" ${isChecked} onchange="toggleRead('${itemId}')">
+                            </label>
+                        </div>
+                        <div class="prose prose-lg text-gray-400 max-w-none">
+                            ${section.content}
+                        </div>
+                    </div>
+                `;
             });
-            btn.classList.remove('text-brain-subtext', 'hover:text-white');
-            btn.classList.add('bg-brain-card', 'text-white', 'shadow-lg');
 
-            // Content Switching
-            const contents = card.querySelectorAll('.tab-content');
-            contents.forEach(c => c.classList.add('hidden'));
+            contentArea.innerHTML = html;
             
-            const target = document.getElementById(targetId);
-            if(target) {
-                target.classList.remove('hidden');
-                target.classList.add('animate-fade-in');
+            // Scroll top
+            document.querySelector('.main-content').scrollTop = 0;
+            
+            // Mobile: Close sidebar
+            sidebar.classList.remove('open');
+            
+            updateSectionProgress();
+        };
+
+        window.toggleRead = (id) => {
+            const el = document.getElementById(id);
+            localStorage.setItem(id, el.checked);
+            updateProgress();
+            updateSectionProgress();
+        };
+
+        function updateSectionProgress() {
+            if (!activeKey) return;
+            const data = fullContent[activeKey];
+            let total = data.sections.length;
+            let checked = 0;
+            
+            data.sections.forEach((_, index) => {
+                if (localStorage.getItem(`chk_${activeKey}_${index}`) === 'true') checked++;
+            });
+            
+            sectionProgress.innerText = `${checked}/${total}`;
+        }
+
+        function updateProgress() {
+            let total = 0;
+            let checked = 0;
+            
+            for (const [key, data] of Object.entries(fullContent)) {
+                data.sections.forEach((_, index) => {
+                    total++;
+                    if (localStorage.getItem(`chk_${key}_${index}`) === 'true') checked++;
+                });
+            }
+            
+            const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
+            globalPercent.innerText = `${percent}%`;
+            globalBar.style.width = `${percent}%`;
+        }
+
+        window.resetProgress = () => {
+            if(confirm('Reset all reading progress?')) {
+                localStorage.clear();
+                location.reload();
             }
         };
 
-        // --- Accordions ---
-        window.toggleAccordion = function(btn) {
-            const content = btn.nextElementSibling;
-            const icon = btn.querySelector('.fa-chevron-down');
-            
-            if (content.style.maxHeight) {
-                // Close
-                content.style.maxHeight = null;
-                content.classList.remove('open');
-                icon.style.transform = 'rotate(0deg)';
-                btn.classList.remove('bg-white/5'); 
-            } else {
-                // Open
-                content.style.maxHeight = content.scrollHeight + "px";
-                content.classList.add('open');
-                icon.style.transform = 'rotate(180deg)';
-                btn.classList.add('bg-white/5');
-            }
-        };
+        // Mobile Menu Logic
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
 
-        // --- Charts ---
-        document.addEventListener('DOMContentLoaded', () => {
-            Chart.defaults.font.family = "'Inter', sans-serif";
-            Chart.defaults.color = '#9ca3af';
-            Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
-            
-            // 1. TCO Chart
-            const ctxTCO = document.getElementById('chart-tco');
-            if(ctxTCO) {
-                // Create Gradient
-                let gradientMono = ctxTCO.getContext('2d').createLinearGradient(0, 0, 0, 400);
-                gradientMono.addColorStop(0, 'rgba(249, 115, 22, 0.2)');
-                gradientMono.addColorStop(1, 'rgba(249, 115, 22, 0)');
-
-                let gradientMicro = ctxTCO.getContext('2d').createLinearGradient(0, 0, 0, 400);
-                gradientMicro.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
-                gradientMicro.addColorStop(1, 'rgba(59, 130, 246, 0)');
-
-                new Chart(ctxTCO, {
-                    type: 'line',
-                    data: {
-                        labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
-                        datasets: [
-                            {
-                                label: 'Monolith TCO',
-                                data: [10, 20, 45, 80, 120],
-                                borderColor: '#F97316', // Orange
-                                backgroundColor: gradientMono,
-                                tension: 0.4,
-                                fill: true,
-                                pointRadius: 0,
-                                pointHoverRadius: 6,
-                                borderWidth: 2
-                            },
-                            {
-                                label: 'Microservices TCO',
-                                data: [50, 55, 60, 65, 70],
-                                borderColor: '#3B82F6', // Blue
-                                backgroundColor: gradientMicro,
-                                tension: 0.4,
-                                fill: true,
-                                pointRadius: 0,
-                                pointHoverRadius: 6,
-                                borderWidth: 2
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false,
-                        },
-                        plugins: {
-                            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 6, padding: 20, color: '#9ca3af' } },
-                            tooltip: {
-                                backgroundColor: 'rgba(28, 28, 30, 0.95)',
-                                titleColor: '#fff',
-                                bodyColor: '#ccc',
-                                borderColor: 'rgba(255,255,255,0.1)',
-                                borderWidth: 1,
-                                padding: 12,
-                                displayColors: true,
-                                boxPadding: 6
-                            }
-                        },
-                        scales: {
-                            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-                            y: { grid: { borderDash: [4, 4], color: 'rgba(255,255,255,0.05)' }, ticks: { display: false }, beginAtZero: true }
-                        }
-                    }
-                });
-            }
-
-            // 2. Rule of 40 Chart
-            const ctxRule = document.getElementById('chart-rule40');
-            if(ctxRule) {
-                new Chart(ctxRule, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Struggling', 'Healthy'],
-                        datasets: [
-                            {
-                                label: 'Profit Margin',
-                                data: [10, 20],
-                                backgroundColor: '#10B981', // Emerald
-                                borderRadius: 4,
-                                barThickness: 30,
-                            },
-                            {
-                                label: 'Growth Rate',
-                                data: [10, 30],
-                                backgroundColor: '#3B82F6', // Blue
-                                borderRadius: 4,
-                                barThickness: 30,
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: { stacked: true, grid: { display: false } },
-                            y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: v => v + '%' } }
-                        },
-                        plugins: {
-                            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, color: '#9ca3af' } },
-                            tooltip: { 
-                                backgroundColor: 'rgba(28, 28, 30, 0.95)',
-                                titleColor: '#fff',
-                                bodyColor: '#ccc', 
-                                padding: 12,
-                                borderColor: 'rgba(255,255,255,0.1)',
-                                borderWidth: 1
-                            }
-                        }
-                    }
-                });
+        // Close sidebar on outside click
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth < 768 && 
+                !sidebar.contains(e.target) && 
+                !menuBtn.contains(e.target) &&
+                sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
             }
         });
+
+        // CSS Animation for Fade In
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fade-in {
+                animation: fadeIn 0.5s ease forwards;
+                opacity: 0;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Run
+        init();
+
     </script>
 </body>
 </html>
